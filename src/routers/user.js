@@ -18,6 +18,11 @@ let upload = multer({
     }
 })
 
+router.get('/users/me', auth, (req, res) => {
+    
+    res.send(req.user)
+})
+
 router.post('/users', async (req, res) => {
 
     const user = new User(req.body)
@@ -70,10 +75,6 @@ router.get('/users/:id', async (req, res) => {
         res.status(404).send()
     }
     
-})
-
-router.get('/users/me', auth, (req, res) => {
-    res.send(req.user)
 })
 
 router.patch('/users/me', auth,  async (req, res) => {
