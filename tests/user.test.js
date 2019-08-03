@@ -36,7 +36,7 @@ test('Should signup a user', async () => {
             email: 'andrew@testerexample.com',
         }
     })
-    
+
 
     expect(response.body.user.password).not.toBe('senhadusguri71')
 
@@ -87,4 +87,35 @@ test('Should not delete an account for an unauthenticated user', async () => {
     await request(app).delete('/users/me')
         .send()
         .expect(401)
+})
+
+test('Should upload an user image', async () => {
+    await request(app).post('/users/me/avatar')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .attach('avatar', 'tests/fixtures/profile-pic.jpg')
+        .expect(200)
+    let user = await User.findById(userOneId)
+    expect(user.avatar).toEqual(expect.any(Buffer))
+})
+
+test('Should update valid user fields', async () => {
+    let response = await request(app).patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({
+            name: 'Tester Blowed',
+            email: 'tester69@tester.com',
+        })
+        .expect(200)
+    
+    expect(response.body.name).toBe('Tester Blowed')
+    expect(response.body.email).toBe('tester69@tester.com')
+})
+
+test('Should not update invalid user fields', async()=> {
+    await request(app).patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({
+            nickname: 'Guri Bad'
+        })
+        .expect(400)
 })
